@@ -79,6 +79,7 @@ def crawler(year, list_start, list_step, review_start, review_step):
     return df_reviews
 
 
+#(year, list_start, list_step, review_start, review_step)
 if __name__ == "__main__":
     processes = 6  # 코어 수
     total_list = 6  # 연도별 크롤링할 페이지 수 / 총 영화 수는 대략 total_list * 10
@@ -91,5 +92,5 @@ if __name__ == "__main__":
     pool.close()
     pool.join()
     df_concat = pd.concat(results, ignore_index=True)
-    df_concat.to_csv("../crawling_data/reviews_2019.csv", index=False)
+    df_concat.to_csv("../crawling_data/score_review_2019.csv", index=False)
     print(df_concat)
