@@ -8,6 +8,7 @@ import requests
 import re
 import pandas as pd
 import numpy as np
+import time
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
 from multiprocessing import Pool
@@ -32,23 +33,35 @@ def crawler(year, list_start, list_step, review_start, review_step):
             ]
 
             driver = webdriver.Chrome(chromedriver)
-            driver.implicitly_wait(3)
+            driver.implicitly_wait(10)
 
             for href, title in hrefs:
                 for page_review in range(review_start, review_start + review_step):
                     try:
-                        BASE_URL = f"https://movie.naver.com/movie/bi/mi/pointWriteFormList.nhn?{href}&page={page_review}"
+                        BASE_URL = f"https://movie.naver.com/movie/bi/mi/review.nhn?{href}&page={page_review}"
                         driver.get(BASE_URL)
-                        if driver.find_element_by_xpath('//strong[@class="total"]/em').text == "0":
+                        if driver.find_element_by_xpath('//span[@class="cnt"]/em').text == "0":
                             break
                         page_current = driver.find_element_by_xpath(
                             '//div[@class="paging"]//span[@class="on"]'
                         ).text
                         if int(page_current) == page_review:
-                            reviews = driver.find_elements_by_xpath('//div[@class="score_reple"]/p')
-                            reviews = [review.text for review in reviews]
+                            review_pages = driver.find_elements_by_xpath(
+                                '//ul[@class="rvw_list_area"]/li/a'
+                            )
+                            reviews = []
+                            for i in range(1, len(review_pages) + 1):
+                                driver.find_element_by_xpath(
+                                    f'//ul[@class="rvw_list_area"]/li[{i}]/a'
+                                ).click()
+                                review = driver.find_element_by_xpath(
+                                    '//*[@class="user_tx_area"]'
+                                ).text
+                                driver.back()
+                                reviews.append(review)
                             df = pd.DataFrame(reviews, columns=["reviews"])
                             df["titles"] = title
+                            df["years"] = year
                             df_reviews = pd.concat([df_reviews, df], ignore_index=True)
                         else:
                             break
@@ -59,16 +72,18 @@ def crawler(year, list_start, list_step, review_start, review_step):
 
 
 if __name__ == "__main__":
-    processes = 6
-    total_list = 6
-    list_step = round(total_list / processes)
-    review_step = 1
-    iterable = [[2019, i * list_step + 1, list_step, 1, review_step] for i in range(processes)]
-    print(iterable)
-    pool = Pool(processes=processes)
-    results = pool.starmap(crawler, iterable)
-    pool.close()
-    pool.join()
-    df_concat = pd.concat(results, ignore_index=True)
-    df_concat.to_csv("../crawling_data/reviews_2019.csv", index=False)
-    print(df_concat)
+    df = crawler(2019, 1, 1, 1, 1)
+    df.to_csv("../crawling_data/reviews_2019.csv", index=False)
+    # processes = 6
+    # total_list = 6
+    # list_step = round(total_list / processes)
+    # review_step = 1
+    # iterable = [[2019, i * list_step + 1, list_step, 1, review_step] for i in range(processes)]
+    # print(iterable)
+    # pool = Pool(processes=processes)
+    # results = pool.starmap(crawler, iterable)
+    # pool.close()
+    # pool.join()
+    # df_concat = pd.concat(results, ignore_index=True)
+    # df_concat.to_csv("../crawling_data/reviews_2019.csv", index=False)
+    # print(df_concat)
