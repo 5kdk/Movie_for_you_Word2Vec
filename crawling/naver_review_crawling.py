@@ -93,5 +93,5 @@ if __name__ == "__main__":
     pool.close()
     pool.join()
     df_concat = pd.concat(results, ignore_index=True)
-    df_concat.to_csv("../crawling_data/review_2021.csv", index=False)
+    df_concat.to_csv("../crawling_data/reviews_2021_new.csv", index=False)
     print(df_concat)
