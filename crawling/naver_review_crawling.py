@@ -79,17 +79,19 @@ def crawler(year, list_start, list_step, review_start, review_step):
     return df_reviews
 
 
+
+#(year, list_start, list_step, review_start, review_step)
 if __name__ == "__main__":
-    processes = 6  # 코어 수
-    total_list = 6  # 연도별 크롤링할 페이지 수 / 총 영화 수는 대략 total_list * 10
+    processes = 4  # 코어 수
+    total_list = 26  # 연도별 크롤링할 페이지 수 / 총 영화 수는 대략 total_list * 10
     list_step = round(total_list / processes)
-    review_step = 1  # 리뷰 크롤링할 페이지 수 / 총 리뷰 수는 대략 review_step * 10?
-    iterable = [[2019, i * list_step + 1, list_step, 1, review_step] for i in range(processes)]
+    review_step = 10  # 리뷰 크롤링할 페이지 수 / 총 리뷰 수는 대략 review_step * 10?
+    iterable = [[2021, i * list_step + 1, list_step, 1, review_step] for i in range(processes)]
     print(iterable)
     pool = Pool(processes=processes)
     results = pool.starmap(crawler, iterable)
     pool.close()
     pool.join()
     df_concat = pd.concat(results, ignore_index=True)
-    df_concat.to_csv("../crawling_data/reviews_2019.csv", index=False)
+    df_concat.to_csv("../crawling_data/review_2021.csv", index=False)
     print(df_concat)
