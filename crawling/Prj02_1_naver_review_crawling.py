@@ -15,19 +15,23 @@ from multiprocessing import Pool
 from selenium.common.exceptions import NoSuchElementException
 
 
-def crawler(year, list_start, list_step, review_start, review_step):
-    for page in range(list_start, list_start + list_step):
-        BASE_URL = "https://movie.naver.com/movie/bi/mi/point.nhn?"
+def crawler(year, list_start, list_end, review_start, review_step):
+    chromedriver = "./chromedriver.exe"
+    options = webdriver.ChromeOptions()
+    options.add_argument("--ignore-certificate-errors")
+    options.add_argument("--ignore-ssl-errors")
+    # options.add_argument("--headless")
+    options.add_argument("disable_gpu")
+    options.add_argument("lang=ko_KR")
+
+    driver = webdriver.Chrome(chromedriver, options=options)
+    driver.implicitly_wait(10)
+    df_reviews = pd.DataFrame()
+
+    for page in range(list_start, list_end + 1):
         url = f"https://movie.naver.com/movie/sdb/browsing/bmovie.nhn?open={year}&page={page}"
-        chromedriver = "./chromedriver.exe"
-        options = webdriver.ChromeOptions()
-        options.add_argument("--ignore-certificate-errors")
-        options.add_argument("--ignore-ssl-errors")
-        options.add_argument("disable_gpu")
-        options.add_argument("lang=ko_KR")
 
         response = requests.get(url)
-        df_reviews = pd.DataFrame()
         if response.ok:
             soup = bs(response.text, "html.parser")
 
@@ -36,9 +40,6 @@ def crawler(year, list_start, list_step, review_start, review_step):
             hrefs = [
                 (re_code.search(anchor.attrs["href"]).group(), anchor.text) for anchor in anchors
             ]
-
-            driver = webdriver.Chrome(chromedriver, options=options)
-            driver.implicitly_wait(10)
 
             for href, title in hrefs:
                 for page_review in range(review_start, review_start + review_step):
@@ -75,24 +76,26 @@ def crawler(year, list_start, list_step, review_start, review_step):
                             break
                     except NoSuchElementException:
                         print("NoSuchElementException")
-            driver.close()
+
+    driver.close()
     return df_reviews
 
-#reviews = pd.read_csv("../crawling_data/reviews_2018.csv") # 부족한 페이지 추가를 위해 
 
 if __name__ == "__main__":
-    processes = 8  # 코어 수
-    total_list = 71  # 연도별 크롤링할 페이지 수 / 총 영화 수는 대략 total_list * 10
-    list_step = round(total_list / processes)
+    processes = 6  # 코어 수
+    total_list = 36  # 연도별 크롤링할 페이지 수 / 총 영화 수는 대략 total_list * 10
+    list_step = np.linspace(1, total_list + 1, processes + 1, dtype=int)
     review_step = 10  # 리뷰 크롤링할 페이지 수 / 총 리뷰 수는 대략 review_step * 10?
-    # iterable = [[2018, i * list_step + 1 + 43, list_step, 1, review_step] for i in range(processes)]
-    iterable = [[2015, i * list_step + 1, list_step, 1, review_step] for i in range(processes)]
+    year = 2020
+    iterable = [
+        [year, list_step[i], list_step[i + 1] - 1, 1, review_step] for i in range(processes)
+    ]
     print(iterable)
     pool = Pool(processes=processes)
     results = pool.starmap(crawler, iterable)
+    print(len(results))
     pool.close()
     pool.join()
     df_concat = pd.concat(results, ignore_index=True)
- #   df_concat = pd.concat([reviews, df_concat], ignore_index=True) # 부족한 페이지 추가를 위해 
-    df_concat.to_csv("../crawling_data/reviews_2015.csv", index=False)
+    df_concat.to_csv(f"../crawling_data/reviews_{year}_new.csv", index=False)
     print(df_concat)

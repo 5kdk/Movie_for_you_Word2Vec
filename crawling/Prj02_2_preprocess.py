@@ -7,14 +7,14 @@ from tqdm import tqdm
 tqdm.pandas()
 
 okt = Okt()
-df = pd.read_csv('../crawling_data/reviews_2020.csv')
+df = pd.read_csv('../crawling_data/reviews_2020_new.csv')
 df.head(20)
 
 stopwords = pd.read_csv('../datasets/stopwords.csv', index_col=0)
 #print(stopwords)
 
 # 또 다른 불용어 추가
-movie_stopwords = ['영화', '배우', '감독']
+movie_stopwords = ['영화', '배우', '감독', '관객','작품','주인공','개봉','촬영']
 stopwords_list = list(stopwords.stopword) + movie_stopwords
 
 cleaned_sentences = []
@@ -35,7 +35,7 @@ print(df.info())
 
 df = df[['titles', 'cleaned_sentences']]
 print(df.info())
-df.to_csv('./cleaned_review_2020.csv')
+df.to_csv('../data/cleaned_review_2020.csv')
 # tqdm 없을시 (강사님 포문)
 
 # count = 0
