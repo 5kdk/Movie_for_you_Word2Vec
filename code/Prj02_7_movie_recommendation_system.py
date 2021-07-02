@@ -2,6 +2,7 @@ import pandas as pd
 from sklearn.metrics.pairwise import linear_kernel
 from scipy.io import mmwrite, mmread
 import pickle
+from gensim.models import Word2Vec
 
 # 데이터 불러오기
 df_review_one_sentence = pd.read_csv('../processing_data/movie_review_one_sentence_2015_2021.csv')
@@ -32,10 +33,32 @@ movie_idx = df_review_one_sentence[
 #print(df_review_one_sentence.iloc[movie_idx, 0])
 
 
-cosine_sim = linear_kernel(Tfidf_matrix[movie_idx],
-                           Tfidf_matrix)
-# shape: (1, len(Tfidf_matrix))
+# cosine_sim = linear_kernel(Tfidf_matrix[movie_idx],
+#                            Tfidf_matrix)
+# # shape: (1, len(Tfidf_matrix))
+# # 유사한 영화 10개를 추천
+# recommendation = getRecommendation(cosine_sim)
+# print(recommendation)
+
+
+embedding_model = Word2Vec.load('../models/word2VecModel_2015_2021.model')
+key_word = "전율"
+sentence = [key_word] * 10
+if key_word in embedding_model.wv.key_to_index:
+    sim_word = embedding_model.wv.most_similar(key_word, topn=10)
+    labels = []
+    for label, _ in sim_word:
+        labels.append(label)
+    print(labels)
+    # 가장 유사한 단어를 많이 저장 ex) ['소름', '돋다', '온몸', '벅차오르다', '흥분', '짜릿하다', '웅장', '압도', '감동', '카타르']
+    for i, word in enumerate(labels):
+        sentence += [word] * (9 - i)
+
+# 유사한 단어를 조합한 문장
+sentence = " ".join(sentence)
+print(sentence)
+
+sentence_vec = Tfidf.transform([sentence])
+cosine_sim = linear_kernel(sentence_vec, Tfidf_matrix)
 recommendation = getRecommendation(cosine_sim)
-# 유사한 영화 10개를 추천
-print(recommendation)
-# 추천된 영화 확인
+print(recommendation['titles'])
