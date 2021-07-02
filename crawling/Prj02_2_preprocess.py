@@ -7,7 +7,7 @@ from tqdm import tqdm
 tqdm.pandas()
 
 okt = Okt()
-df = pd.read_csv('../crawling_data/reviews_2020_new.csv')
+df = pd.read_csv('../crawling_data/reviews_2020.csv')
 df.head(20)
 
 stopwords = pd.read_csv('../datasets/stopwords.csv', index_col=0)

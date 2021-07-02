@@ -1,8 +1,8 @@
 import pandas as pd
 from glob import glob
 
-files_c = glob("../clean_data/cleaned_review_*.csv")
-files_o = glob("../crawling_data/one_sentence_review_*.csv")
+files_c = glob("../data/cleaned_review_*.csv")
+files_o = glob("../data/one_sentence_review_*.csv")
 df_cleaned = pd.DataFrame()
 df_one = pd.DataFrame()
 # 중복 및 null 제거 후 concat

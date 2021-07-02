@@ -1,9 +1,9 @@
 import pandas as pd
 
 #데이터 불러오기
-df = pd.read_csv('../data/cleaned_review_2020.csv', index_col=0)
+df = pd.read_csv('../data/cleaned_review_2016.csv', index_col=0)
 df.dropna(inplace=True)
-df.to_csv('../data/cleaned_review_2020.csv')
+df.to_csv('../data/cleaned_review_2016.csv')
 
 one_sentences = []
 for idx, title in enumerate(df['titles'].unique()):  #제목은 하나씩만 가져오기
@@ -15,4 +15,4 @@ for idx, title in enumerate(df['titles'].unique()):  #제목은 하나씩만 가
 df_one_sentences = pd.DataFrame({'titles':df['titles'].unique(), 'reviews':one_sentences})
 print(df_one_sentences.head())
 #파일 저장
-df_one_sentences.to_csv('../data/one_sentence_review_2020.csv')
+df_one_sentences.to_csv('../data/one_sentence_review_2016.csv')
