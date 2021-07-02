@@ -46,8 +46,9 @@ plt.scatter(0, 0, s=1500, marker='*')  #* 문장으로 마커를 찍어준다, 1
 for i in range(len(df_xy.x)):
     a = df_xy.loc[[i, 10], :]
     plt.plot(a.x, a.y, '-D', linewidth=2)
-    #annotate = plt의 주석
-    plt.annotate(df_xy.words[i], xytext=(5, 2), xy=(df_xy.x[i], df_xy.y[i]), textcoords='offset points', ha='right',
+    #annotate = plt의 주석을 다는 것, df_xy.words[i]=좌표의 이름, xytext=주석을 표시할 xy좌표를 설정할 때 사용,xy=화살표가 가르키는 점의 위치, 'offset points=xy(좌표 측의 값)에서부터 xytext offset 위치(단위 point)에 출력
+
+    plt.annotate(df_xy.words[i], xytext=(5, 2), xy=(df_xy.x[i], df_xy.y[i]), textcoords='offset points', ha='right', #xy=화살표가 가르키는 점의 위치, ha=horizontal alignment, va=vetical alignment
                  va='bottom')
 
 plt.show()
