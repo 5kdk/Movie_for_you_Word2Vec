@@ -1,8 +1,8 @@
 import pandas as pd
 from glob import glob
 
-files = glob("../crawling_data/cleaned_review_*.csv")
-#files = glob("../crawling_data/one_sentence_review_*.csv")
+#files = glob("../processing_data/cleaned_review_*.csv")
+files = glob("../processing_data/one_sentence_review_*.csv")
 df = pd.DataFrame()
 
 # 중복 및 null 제거 후 concat
@@ -15,5 +15,5 @@ for file in files:
     df = pd.concat([df, df_temp])
 
 print(df.info())
-df.to_csv("../crawling_data/movie_review_2015-2021.csv", index=False)
-#df.to_csv("./crawling_data/movie_review_one_sentence_2015-2021.csv", index=False)
+#df.to_csv("../processing_data/movie_review_2015_2021.csv", index=False)
+df.to_csv("../processing_data/movie_review_one_sentence_2015-2021.csv", index=False)

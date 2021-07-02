@@ -5,7 +5,7 @@ years = [2015, 2016, 2017, 2018, 2019, 2020, 2021]
 for year in years:
     
     #데이터 불러오기
-    df = pd.read_csv(f'../crawling_data/cleaned_review_{year}.csv',
+    df = pd.read_csv(f'../processing_data/cleaned_review_{year}.csv',
                     index_col=0)
     df.dropna(inplace=True)
 
@@ -19,4 +19,4 @@ for year in years:
     df_one_sentences = pd.DataFrame({'titles':df['titles'].unique(), 'reviews':one_sentences})
     print(df_one_sentences.head())
     # 파일 저장
-    df_one_sentences.to_csv(f'../crawling_data/one_sentence_review_{year}.csv')
+    df_one_sentences.to_csv(f'../processing_data/one_sentence_review_{year}.csv')
